@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+    body{
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: pink;
+    }
+    h1{
+        font-weight: bold;
+        color:purple;
+        font-size: 3rem;
+        text-align: center;
+        margin-top: 30px;
+    
+    }
+    form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 30px;
+    }
+    input{
+        border: 1px solid grey;
+        border-radius: 4px;
+        margin-top: 30px;
+        padding: 8px;
+    
+        width:200px;
+    }
+    button{
+        background-color: purple;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        color: white;
+        margin-top: 30px;
+    }
+    #messageArea{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        margin-top: 30px;
+    }
+</style>
+</head>
+<body>
+    <h1>Chat Application</h1>
+   <form id="form">
+    <input type="text" placeholder="Name" id="myname">
+    <input type="text" placeholder="Message" id="message">
+    <button type="submit">Send</button>
+   </form>
+   <div id="messageArea"></div>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    let socket = io();
+    let form = document.getElementById('form');
+    let myname = document.getElementById('myname');
+    let message = document.getElementById('message');
+    let messageArea = document.getElementById('messageArea');
+
+    console.log("Form, inputs, and message area loaded:", form, myname, message, messageArea);
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (message.value) {
+            console.log("Sending name:", myname.value);
+            console.log("Sending message:", message.value);
+            socket.emit('send name', myname.value);
+            socket.emit('send message', message.value);
+            message.value = "";
+        }
+    });
+
+    socket.on("send name", (username) => {
+        console.log("Received username:", username);
+        let name = document.createElement("p");
+        name.style.backgroundColor = "purple";
+        name.style.width = "100%";
+        name.style.height="20px";
+        name.style.textAlign = "center";
+        name.style.color = "white";
+        name.textContent = username + ":";
+        messageArea.appendChild(name);
+    });
+
+    socket.on("send message", (chat) => {
+        console.log("Received message:", chat);
+        let chatContent = document.createElement("p");
+        chatContent.textContent = chat;
+        messageArea.appendChild(chatContent);
+    });
+</script>
+</html>
